@@ -740,7 +740,7 @@ u32 RCC_GetAHP_Speed()
 STD_ERROR RCC_EnableAHP_PeripheralClock(u32 RCC_AHBENR )
 {
   STD_ERROR LocalError=OK;
- if(RCC_AHBENR<0x800)
+ if(RCC_AHBENR>=0x800)
  {
    LocalError=NOT_VALID_INPUTS;
  } 
@@ -799,7 +799,7 @@ else
 STD_ERROR RCC_EnableAPB2_PeripheralClock(u32 RCC_APB2ENR )
 {
   STD_ERROR LocalError=OK;
- if(RCC_APB2ENR>=0x400000‬)
+ if(RCC_APB2ENR>=0x400000)
  {
    LocalError=NOT_VALID_INPUTS;
  } 
@@ -814,7 +814,7 @@ else
 STD_ERROR RCC_DisableAPB2_PeripheralClock(u32 RCC_APB2ENR)
 {
  STD_ERROR LocalError=OK;
- if(RCC_APB2ENR>=0x400000‬)
+ if(RCC_APB2ENR>=0x400000)
  {
    LocalError=NOT_VALID_INPUTS;
  } 
