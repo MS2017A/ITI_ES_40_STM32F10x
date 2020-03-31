@@ -654,84 +654,6 @@ STD_ERROR RCC_SetMCO(u32 RCC_CFGR_MCO)
 }
 
 
-/*Thsi function shall Get AHP Speed in hz 
-Inputs:{void}
-Outputs:{u32}Speed of AHP in hz
-*/
-u32 RCC_GetAHP_Speed()
-{
-	u32 Speed=0;
-	u32 CLK;
-	u32 PLLSRC;
-	u32 PLLDivider=1;
-	RCC_GetSystemClock(&CLK);
-	switch(CLK)
-	{
-	case CLOCK_HSI:
-		Speed=INTERNAL_CLK_SPEED;
-		break;
-	case CLOCK_HSE:
-		Speed=EXTERNAL_CLK_SPEED;
-		//trace_printf("%d",Speed);
-		break;
-	case CLOCK_PLL:
-		PLLSRC=RCC->CFGR;
-		PLLSRC&=~RCC_CFGR_PLLSRC_MASK;
-
-		PLLDivider=RCC->CFGR;
-		if(PLLSRC & RCC_CFGR_PLLSRC_HSI_DIV2)
-		{
-			Speed=INTERNAL_CLK_SPEED/2;
-		}
-		else
-		{
-			Speed=EXTERNAL_CLK_SPEED;
-		//	trace_printf("%d",Speed);
-			if(PLLDivider&RCC_CFGR_PLLXTPRE_HSE_DIV2)
-			{
-				Speed/=2;
-	//			trace_printf("%d",Speed);
-			}
-		}
-		u32 PLL_MUL_Factor=RCC_GetPLL_MUL_Factor();
-		Speed*=PLL_MUL_Factor;
-//		trace_printf("%d",Speed);
-		break;
-	}
-
-	u32 Prescaler=RCC_GetAHP_Prescaler();
-	u32 Factor=1;
-	switch (Prescaler)
-	{
-	case RCC_CFGR_HPRE_SYSCLK_DIVIDED_2:
-		Factor=2;
-		break;
-	case RCC_CFGR_HPRE_SYSCLK_DIVIDED_4:
-		Factor=4;
-		break;
-	case RCC_CFGR_HPRE_SYSCLK_DIVIDED_8:
-		Factor=8;
-		break;
-	case RCC_CFGR_HPRE_SYSCLK_DIVIDED_16:
-		Factor=16;
-		break;
-	case RCC_CFGR_HPRE_SYSCLK_DIVIDED_64:
-		Factor=64;
-		break;
-	case RCC_CFGR_HPRE_SYSCLK_DIVIDED_128:
-		Factor=128;
-		break;
-	case RCC_CFGR_HPRE_SYSCLK_DIVIDED_256:
-		Factor=256;
-		break;
-	case RCC_CFGR_HPRE_SYSCLK_DIVIDED_512:
-		Factor=512;
-		break;
-	}
-	Speed/=Factor;
-	trace_printf("%d",Speed);
-	return Speed;
-}
 
 
 
@@ -823,5 +745,83 @@ else
   RCC->APB2ENR&=~RCC_APB2ENR;
 }  
   return LocalError;
+}
+/*Thsi function shall Get AHP Speed in hz
+Inputs:{void}
+Outputs:{u32}Speed of AHP in hz
+*/
+u32 RCC_GetAHP_Speed()
+{
+	u32 Speed=0;
+	u32 CLK;
+	u32 PLLSRC;
+	u32 PLLDivider=1;
+	RCC_GetSystemClock(&CLK);
+	switch(CLK)
+	{
+	case CLOCK_HSI:
+		Speed=INTERNAL_CLK_SPEED;
+		break;
+	case CLOCK_HSE:
+		Speed=EXTERNAL_CLK_SPEED;
+		//trace_printf("%d",Speed);
+		break;
+	case CLOCK_PLL:
+		PLLSRC=RCC->CFGR;
+		PLLSRC&=~RCC_CFGR_PLLSRC_MASK;
+
+		PLLDivider=RCC->CFGR;
+		if(PLLSRC & RCC_CFGR_PLLSRC_HSI_DIV2)
+		{
+			Speed=INTERNAL_CLK_SPEED/2;
+		}
+		else
+		{
+			Speed=EXTERNAL_CLK_SPEED;
+		//	trace_printf("%d",Speed);
+			if(PLLDivider&RCC_CFGR_PLLXTPRE_HSE_DIV2)
+			{
+				Speed/=2;
+	//			trace_printf("%d",Speed);
+			}
+		}
+		u32 PLL_MUL_Factor=RCC_GetPLL_MUL_Factor();
+		Speed*=PLL_MUL_Factor;
+//		trace_printf("%d",Speed);
+		break;
+	}
+
+	u32 Prescaler=RCC_GetAHP_Prescaler();
+	u32 Factor=1;
+	switch (Prescaler)
+	{
+	case RCC_CFGR_HPRE_SYSCLK_DIVIDED_2:
+		Factor=2;
+		break;
+	case RCC_CFGR_HPRE_SYSCLK_DIVIDED_4:
+		Factor=4;
+		break;
+	case RCC_CFGR_HPRE_SYSCLK_DIVIDED_8:
+		Factor=8;
+		break;
+	case RCC_CFGR_HPRE_SYSCLK_DIVIDED_16:
+		Factor=16;
+		break;
+	case RCC_CFGR_HPRE_SYSCLK_DIVIDED_64:
+		Factor=64;
+		break;
+	case RCC_CFGR_HPRE_SYSCLK_DIVIDED_128:
+		Factor=128;
+		break;
+	case RCC_CFGR_HPRE_SYSCLK_DIVIDED_256:
+		Factor=256;
+		break;
+	case RCC_CFGR_HPRE_SYSCLK_DIVIDED_512:
+		Factor=512;
+		break;
+	}
+	Speed/=Factor;
+	trace_printf("%d",Speed);
+	return Speed;
 }
 

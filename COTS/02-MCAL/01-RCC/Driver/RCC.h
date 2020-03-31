@@ -35,7 +35,7 @@
                                                 
 #define RCC_CR_HSI_RDY_MASK				              0x00000002
 /*This defines for HSE ON */                    
-#define RCC_CR_HSE_ON_MASK                      0x00010000
+#define RCC_CR_HSE_ON_MASK   	                     0x00010000
                                                 
 /*This defines for HSE Ready */                 
                                                 
@@ -337,7 +337,6 @@ STD_ERROR RCC_SetADC_Prescaler(u32 RCC_CFGR_ADC_PCLK);
 STD_ERROR RCC_SetPLL_Divisor(u32 RCC_CFGR_PLLXTPRE);
 STD_ERROR RCC_SetUSB_Prescaler(u32 RCC_CFGR_USBPRE_PLL);
 STD_ERROR RCC_SetMCO(u32 RCC_CFGR_MCO);
-u32 RCC_GetAHP_Speed();
 u32 RCC_GetPLL_MUL_Factor();
 STD_ERROR RCC_EnableAHP_PeripheralClock(u32 RCC_AHBENR );
 STD_ERROR RCC_DisableAHP_PeripheralClock(u32 RCC_AHBENR);
@@ -345,3 +344,4 @@ STD_ERROR RCC_EnableAPB1_PeripheralClock(u32 RCC_APB1ENR );
 STD_ERROR RCC_DisableAPB1_PeripheralClock(u32 RCC_APB1ENR);
 STD_ERROR RCC_EnableAPB2_PeripheralClock(u32 RCC_APB2ENR );
 STD_ERROR RCC_DisableAPB2_PeripheralClock(u32 RCC_APB2ENR);
+u32 RCC_GetAHP_Speed();
