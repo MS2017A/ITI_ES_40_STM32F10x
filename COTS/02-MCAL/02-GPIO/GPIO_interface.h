@@ -11,7 +11,7 @@
 #ifndef GPIO_INTERFACE_H_
 #define GPIO_INTERFACE_H_
 
-
+#include"STD_TYPES.h"
 /***************************************Base Address for Ports' Registers*************************************************/
 
 #define PORTA	((void*)(0x40010800))

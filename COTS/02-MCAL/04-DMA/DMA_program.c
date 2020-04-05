@@ -1,3 +1,12 @@
+/**********************************************************************************************
+Author :Mohamed Ibrahem
+Version:1.0
+Date:5 April 2020
+Description:This Source file is used to interface with the DMA module in STM32f10x evaluation kit
+ ***********************************************************************************************/
+
+
+
 #include "BIT_MATH.h"
 #include "STD_TYPES.h"
 #include "DMA_cnfg.h"
@@ -55,10 +64,10 @@ Outputs:STD_ERROR
 
  */
 
-STD_ERROR DMA_enableChannel(u32 DMA_CHANNEL)
+STD_ERROR DMA_enableChannel(u8 DMA_CHANNEL)
 {
 	STD_ERROR LocalError=OK;
-	if(DMA_CHANNEL>=0 && DMA_CHANNEL< 7)
+	if(DMA_CHANNEL< 7)
 	{
 		DMA->CH[DMA_CHANNEL].CCR|=DMA_CCR_ENABLE;
 	}
@@ -84,10 +93,10 @@ Outputs:STD_ERROR
 
  */
 
-STD_ERROR DMA_disableChannel(u32 DMA_CHANNEL)
+STD_ERROR DMA_disableChannel(u8 DMA_CHANNEL)
 {
 	STD_ERROR LocalError=OK;
-	if(DMA_CHANNEL>=0 && DMA_CHANNEL< 7)
+	if(DMA_CHANNEL< 7)
 	{
 		DMA->CH[DMA_CHANNEL].CCR&=DMA_CCR_DISABLE;
 	}
@@ -116,12 +125,12 @@ Outputs:STD_ERROR
 
  */
 
-STD_ERROR DMA_setCBF_EndOfTransfer(u32 DMA_CHANNEL,void(*CBF)(void))
+STD_ERROR DMA_setCBF_EndOfTransfer(u8 DMA_CHANNEL,void(*CBF)(void))
 {
 	STD_ERROR LocalError =OK;
 	if(CBF)
 	{
-		if(DMA_CHANNEL >=0 && DMA_CHANNEL <7)
+		if(DMA_CHANNEL <7)
 		{
 			DMA_CBF_EndOfTransfer[DMA_CHANNEL]=CBF;
 			LocalError=OK;
@@ -153,12 +162,12 @@ void (*CBF)(void)
 
 Outputs:STD_ERROR
  */
-STD_ERROR DMA_setCBF_HalfOfTransfer(u32 DMA_CHANNEL,void(*CBF)(void))
+STD_ERROR DMA_setCBF_HalfOfTransfer(u8 DMA_CHANNEL,void(*CBF)(void))
 {
 	STD_ERROR LocalError =OK;
 	if(CBF)
 	{
-		if(DMA_CHANNEL >=0 && DMA_CHANNEL <7)
+		if( DMA_CHANNEL <7)
 		{
 			DMA_CBF_HalfOfTransfer[DMA_CHANNEL]=CBF;
 			LocalError=OK;
@@ -193,12 +202,12 @@ Outputs:STD_ERROR
  */
 
 
-STD_ERROR DMA_setCBF_ErrorInTransfer(u32 DMA_CHANNEL,void(*CBF)(void))
+STD_ERROR DMA_setCBF_ErrorInTransfer(u8 DMA_CHANNEL,void(*CBF)(void))
 {
 	STD_ERROR LocalError =OK;
 	if(CBF)
 	{
-		if(DMA_CHANNEL >=0 && DMA_CHANNEL <7)
+		if(DMA_CHANNEL <7)
 		{
 			DMA_CBF_ErrorInTransfer[DMA_CHANNEL]=CBF;
 			LocalError=OK;
@@ -216,7 +225,7 @@ STD_ERROR DMA_setCBF_ErrorInTransfer(u32 DMA_CHANNEL,void(*CBF)(void))
 }
 
 /*This function shall set the call back function for error in the transfer 
-Inputs: u32 DMA_CHANNEL
+Inputs: u8 DMA_CHANNEL
         DMA_CHANNEL_1
         DMA_CHANNEL_2 
         DMA_CHANNEL_3 
@@ -234,10 +243,10 @@ Inputs: u32 DMA_CHANNEL
 Outputs:STD_ERROR
  */
 
-STD_ERROR DMA_SetChannelPriority(u32 DMA_CHANNEL,u32 DMA_CCR_PL)
+STD_ERROR DMA_SetChannelPriority(u8 DMA_CHANNEL,u32 DMA_CCR_PL)
 {
 	STD_ERROR LocalError=OK;
-	if((DMA_CHANNEL>=0 && DMA_CHANNEL< 7)  && (DMA_CCR_PL == DMA_CCR_PL_LOW ||DMA_CCR_PL==DMA_CCR_PL_MED|| DMA_CCR_PL== DMA_CCR_PL_VERY_HIGH))
+	if((DMA_CHANNEL< 7)  && (DMA_CCR_PL == DMA_CCR_PL_LOW ||DMA_CCR_PL==DMA_CCR_PL_MED|| DMA_CCR_PL== DMA_CCR_PL_VERY_HIGH))
 	{
 		DMA->CH[DMA_CHANNEL].CCR&=DMA_CCR_PL_MASK;
 		DMA->CH[DMA_CHANNEL].CCR|=DMA_CCR_PL;
@@ -251,7 +260,7 @@ STD_ERROR DMA_SetChannelPriority(u32 DMA_CHANNEL,u32 DMA_CCR_PL)
 
 /*This function shall set the call back function for error in the transfer 
 Inputs: 
- ********u32 DMA_CHANNEL**********************
+ ********u8 DMA_CHANNEL**********************
         DMA_CHANNEL_1
         DMA_CHANNEL_2 
         DMA_CHANNEL_3 
@@ -284,11 +293,11 @@ Outputs:STD_ERROR
  */
 
 
-STD_ERROR DMA_configureChannel(u32 DMA_CHANNEL,u32 DMA_CCR_PSIZE,u32 DMA_CCR_PINC,u32 DMA_CCR_MSIZE,u32 DMA_CCR_MINC)
+STD_ERROR DMA_configureChannel(u8 DMA_CHANNEL,u32 DMA_CCR_PSIZE,u32 DMA_CCR_PINC,u32 DMA_CCR_MSIZE,u32 DMA_CCR_MINC)
 {
 	STD_ERROR LocalError=OK;
-	if((DMA_CHANNEL>=0 && DMA_CHANNEL< 7)&&
-			(DMA_CCR_PSIZE >=DMA_CCR_PSIZE_8_BITS || DMA_CCR_PSIZE <=DMA_CCR_PSIZE_16_BITS ||DMA_CCR_PSIZE <=DMA_CCR_PSIZE_32_BITS)&&
+	if((DMA_CHANNEL< 7)&&
+			(DMA_CCR_PSIZE ==DMA_CCR_PSIZE_8_BITS || DMA_CCR_PSIZE ==DMA_CCR_PSIZE_16_BITS || DMA_CCR_PSIZE ==DMA_CCR_PSIZE_32_BITS)&&
 			(DMA_CCR_MSIZE ==DMA_CCR_MSIZE_8_BITS || DMA_CCR_MSIZE ==DMA_CCR_MSIZE_16_BITS ||DMA_CCR_MSIZE ==DMA_CCR_MSIZE_32_BITS)&&
 			(DMA_CCR_PINC == DMA_CCR_PINC_ENABLE || DMA_CCR_PINC == DMA_CCR_PINC_DISABLE)&&
 			(DMA_CCR_MINC == DMA_CCR_MINC_ENABLE || DMA_CCR_MINC == DMA_CCR_MINC_DISABLE))
@@ -307,7 +316,7 @@ STD_ERROR DMA_configureChannel(u32 DMA_CHANNEL,u32 DMA_CCR_PSIZE,u32 DMA_CCR_PIN
 
 /*This function shall Enable the dma interrupts
 Inputs:
- ********u32 DMA_CHANNEL**********************
+ ********u8 DMA_CHANNEL**********************
         DMA_CHANNEL_1
         DMA_CHANNEL_2 
         DMA_CHANNEL_3 
@@ -326,10 +335,10 @@ or use   DMA_CCR_INTERRUPT_TCIE|DMA_CCR_INTERRUPT_HTIE
 Outputs:STD_ERROR         
  */
 
-STD_ERROR DMA_enableInterrupt(u32 DMA_CHANNEL,u32 DMA_CCR_INTERRUPT)
+STD_ERROR DMA_enableInterrupt(u8 DMA_CHANNEL,u32 DMA_CCR_INTERRUPT)
 {
 	STD_ERROR LocalError=OK;
-	if((DMA_CHANNEL>=0 && DMA_CHANNEL< 7)&&
+	if((DMA_CHANNEL< 7)&&
 			(DMA_CCR_INTERRUPT>=DMA_CCR_INTERRUPT_TCIE && DMA_CCR_INTERRUPT<=DMA_CCR_INTERRUPT_ALL))
 	{
 		DMA->CH[DMA_CHANNEL].CCR|=DMA_CCR_INTERRUPT;
@@ -347,7 +356,7 @@ STD_ERROR DMA_enableInterrupt(u32 DMA_CHANNEL,u32 DMA_CCR_INTERRUPT)
 
 /*This function shall Disable the dma interrupts
 Inputs:
- ********u32 DMA_CHANNEL**********************
+ ********u8 DMA_CHANNEL**********************
         DMA_CHANNEL_1
         DMA_CHANNEL_2 
         DMA_CHANNEL_3 
@@ -366,11 +375,11 @@ or use   DMA_CCR_INTERRUPT_TCIE|DMA_CCR_INTERRUPT_HTIE
 Outputs:STD_ERROR         
  */
 
-STD_ERROR DMA_disableInterrupt(u32 DMA_CHANNEL ,u32 DMA_CCR_INTERRUPT)
+STD_ERROR DMA_disableInterrupt(u8 DMA_CHANNEL ,u32 DMA_CCR_INTERRUPT)
 {
 
 	STD_ERROR LocalError=OK;
-	if((DMA_CHANNEL>=0 && DMA_CHANNEL< 7)&&
+	if((DMA_CHANNEL< 7)&&
 			(DMA_CCR_INTERRUPT>=DMA_CCR_INTERRUPT_TCIE && DMA_CCR_INTERRUPT<=DMA_CCR_INTERRUPT_ALL))
 	{
 		if(DMA_CCR_INTERRUPT&DMA_CCR_INTERRUPT_TCIE)
@@ -396,7 +405,7 @@ STD_ERROR DMA_disableInterrupt(u32 DMA_CHANNEL ,u32 DMA_CCR_INTERRUPT)
 
 /*This function shall Enable the circular mode of the dma 
 Inputs:
- ********u32 DMA_CHANNEL**********************
+ ********u8 DMA_CHANNEL**********************
         DMA_CHANNEL_1
         DMA_CHANNEL_2 
         DMA_CHANNEL_3 
@@ -409,10 +418,10 @@ Outputs:STD_ERROR
 
  */
 
-STD_ERROR DMA_enableCircular(u32 DMA_CHANNEL )
+STD_ERROR DMA_enableCircular(u8 DMA_CHANNEL )
 {
 	STD_ERROR LocalError=OK;
-	if(DMA_CHANNEL>=0 && DMA_CHANNEL< 7)
+	if(DMA_CHANNEL< 7)
 	{
 		DMA->CH[DMA_CHANNEL].CCR|=DMA_CCR_CIRC_ENABLE;
 	}
@@ -425,7 +434,7 @@ STD_ERROR DMA_enableCircular(u32 DMA_CHANNEL )
 
 /*This function shall Disable the circular mode of the dma 
 Inputs:
- ********u32 DMA_CHANNEL**********************
+ ********u8 DMA_CHANNEL**********************
         DMA_CHANNEL_1
         DMA_CHANNEL_2 
         DMA_CHANNEL_3 
@@ -438,10 +447,10 @@ Outputs:STD_ERROR
 
  */
 
-STD_ERROR DMA_disableCircular(u32 DMA_CHANNEL)
+STD_ERROR DMA_disableCircular(u8 DMA_CHANNEL)
 {
 	STD_ERROR LocalError=OK;
-	if(DMA_CHANNEL>=0 && DMA_CHANNEL< 7)
+	if(DMA_CHANNEL< 7)
 	{
 		DMA->CH[DMA_CHANNEL].CCR&=DMA_CCR_CIRC_DISABLE;
 	}
@@ -454,7 +463,7 @@ STD_ERROR DMA_disableCircular(u32 DMA_CHANNEL)
 
 /*This function shall Set the dma channel direction  
 Inputs:
- ********u32 DMA_CHANNEL**********************
+ ********u8 DMA_CHANNEL**********************
         DMA_CHANNEL_1
         DMA_CHANNEL_2 
         DMA_CHANNEL_3 
@@ -471,10 +480,10 @@ Outputs:STD_ERROR
 
  */
 
-STD_ERROR DMA_setDirction(u32 DMA_CHANNEL,u32 DMA_CCR_DIR_FROM)
+STD_ERROR DMA_setDirction(u8 DMA_CHANNEL,u32 DMA_CCR_DIR_FROM)
 {
 	STD_ERROR LocalError=OK;
-	if(DMA_CHANNEL>=0 && DMA_CHANNEL< 7 &&
+	if(DMA_CHANNEL< 7 &&
 			(DMA_CCR_DIR_FROM== DMA_CCR_DIR_FROM_PERIPHERAL|| DMA_CCR_DIR_FROM==DMA_CCR_DIR_FROM_MEMORY))
 	{
 		DMA->CH[DMA_CHANNEL].CCR&=DMA_CCR_DIR_MASK;
@@ -490,7 +499,7 @@ STD_ERROR DMA_setDirction(u32 DMA_CHANNEL,u32 DMA_CCR_DIR_FROM)
 
 /*This function shall Enable dma channel memory to memory   
 Inputs:
- ********u32 DMA_CHANNEL**********************
+ ********u8 DMA_CHANNEL**********************
         DMA_CHANNEL_1
         DMA_CHANNEL_2 
         DMA_CHANNEL_3 
@@ -506,10 +515,10 @@ Outputs:STD_ERROR
 
 
 
-STD_ERROR DMA_enableMem2Mem(u32 DMA_CHANNEL )
+STD_ERROR DMA_enableMem2Mem(u8 DMA_CHANNEL )
 {
 	STD_ERROR LocalError=OK;
-	if(DMA_CHANNEL>=0 && DMA_CHANNEL< 7)
+	if(DMA_CHANNEL< 7)
 	{
 		DMA->CH[DMA_CHANNEL].CCR|=DMA_CCR_MEM2MEM_ENABLE;
 	}
@@ -524,7 +533,7 @@ STD_ERROR DMA_enableMem2Mem(u32 DMA_CHANNEL )
 
 /*This function shall Disable dma channel memory to memory   
 Inputs:
- ********u32 DMA_CHANNEL**********************
+ ********u8 DMA_CHANNEL**********************
         DMA_CHANNEL_1
         DMA_CHANNEL_2 
         DMA_CHANNEL_3 
@@ -538,10 +547,10 @@ Outputs:STD_ERROR
  */
 
 
-STD_ERROR DMA_disableMem2Mem(u32 DMA_CHANNEL)
+STD_ERROR DMA_disableMem2Mem(u8 DMA_CHANNEL)
 {
 	STD_ERROR LocalError=OK;
-	if(DMA_CHANNEL>=0 && DMA_CHANNEL< 7)
+	if(DMA_CHANNEL< 7)
 	{
 		DMA->CH[DMA_CHANNEL].CCR&=DMA_CCR_MEM2MEM_DISABLE;
 	}
@@ -557,7 +566,7 @@ STD_ERROR DMA_disableMem2Mem(u32 DMA_CHANNEL)
 
 /*This function shall Set the DMA channel number of data transfer   
 Inputs:
- ********u32 DMA_CHANNEL**********************
+ ********u8 DMA_CHANNEL**********************
         DMA_CHANNEL_1
         DMA_CHANNEL_2 
         DMA_CHANNEL_3 
@@ -570,10 +579,10 @@ Outputs:STD_ERROR
 
  */
 
-STD_ERROR DMA_setNumberOfDataTransfer(u32 DMA_CHANNEL,u32 CopyNumber_Transfer)
+STD_ERROR DMA_setNumberOfDataTransfer(u8 DMA_CHANNEL,u32 CopyNumber_Transfer)
 {
 	STD_ERROR LocalError=OK;
-	if(DMA_CHANNEL>=0 && DMA_CHANNEL< 7)
+	if(DMA_CHANNEL< 7)
 	{
 		DMA->CH[DMA_CHANNEL].CNDTR=CopyNumber_Transfer;
 	}
@@ -587,7 +596,7 @@ STD_ERROR DMA_setNumberOfDataTransfer(u32 DMA_CHANNEL,u32 CopyNumber_Transfer)
 
 /*This function shall Set the DMA channel Peripheral Address  
 Inputs:
- ********u32 DMA_CHANNEL**********************
+ ********u8 DMA_CHANNEL**********************
         DMA_CHANNEL_1
         DMA_CHANNEL_2 
         DMA_CHANNEL_3 
@@ -600,10 +609,10 @@ Outputs:STD_ERROR
 
  */
 
-STD_ERROR DMA_setPeripheralAddress(u32 DMA_CHANNEL,u32 CopyPeripheralAddr)
+STD_ERROR DMA_setPeripheralAddress(u8 DMA_CHANNEL,u32 CopyPeripheralAddr)
 {
 	STD_ERROR LocalError=OK;
-	if(DMA_CHANNEL>=0 && DMA_CHANNEL< 7)
+	if(DMA_CHANNEL< 7)
 	{
 		DMA->CH[DMA_CHANNEL].CPAR=CopyPeripheralAddr;
 	}
@@ -618,7 +627,7 @@ STD_ERROR DMA_setPeripheralAddress(u32 DMA_CHANNEL,u32 CopyPeripheralAddr)
 
 /*This function shall Set the DMA channel Memory Address  
 Inputs:
- ********u32 DMA_CHANNEL**********************
+ ********u8 DMA_CHANNEL**********************
         DMA_CHANNEL_1
         DMA_CHANNEL_2 
         DMA_CHANNEL_3 
@@ -631,10 +640,10 @@ Outputs:STD_ERROR
 
  */
 
-STD_ERROR DMA_setMemoryAddress(u32 DMA_CHANNEL,u32 CopyMemokryAddr)
+STD_ERROR DMA_setMemoryAddress(u8 DMA_CHANNEL,u32 CopyMemokryAddr)
 {
 	STD_ERROR LocalError=OK;
-	if(DMA_CHANNEL>=0 && DMA_CHANNEL< 7)
+	if(DMA_CHANNEL< 7)
 	{
 		DMA->CH[DMA_CHANNEL].CMAR=CopyMemokryAddr;
 	}
@@ -650,233 +659,225 @@ STD_ERROR DMA_setMemoryAddress(u32 DMA_CHANNEL,u32 CopyMemokryAddr)
 
 
 
-DMA1_Channel1_IRQHandler(void)
+void DMA1_Channel1_IRQHandler(void)
 {
-	STD_ERROR LocalError=OK;
 	/*transfer error */
 	if(DMA->ISR &DMA_ISR_TEIF_CH_1)
 	{
+		/*Clear transfer error flag */
+		DMA->IFCR|=DMA_IFCR_CTEIF_CH_1;
 		/*Check the call back function */
 		if(DMA_CBF_ErrorInTransfer[DMA_CHANNEL_1])
 			DMA_CBF_ErrorInTransfer[DMA_CHANNEL_1]();
-		else
-			LocalError=NULL_POINTER;
 	}
 	/*half transfer */
 	if(DMA->ISR &DMA_ISR_HTIF_CH_1)
 	{
+		/*Clear half transfer flag */
+		DMA->IFCR|=DMA_IFCR_CHTIF_CH_1;
 		/*Check the call back function */
 		if(DMA_CBF_HalfOfTransfer[DMA_CHANNEL_1])
 			DMA_CBF_HalfOfTransfer[DMA_CHANNEL_1]();
-		else
-			LocalError=NULL_POINTER;
 	}
 	/*transfer complete                                */
-	if(DMA->ISR &DMA_ISR_HCIF_CH_1)
+	if(DMA->ISR &DMA_ISR_TCIF_CH_1)
 	{
+		/*Clear the transfer flag	*/
+		DMA->IFCR|=DMA_IFCR_CTCIF_CH_1;
 		/*Check the call back function */
 		if(DMA_CBF_EndOfTransfer[DMA_CHANNEL_1])
 			DMA_CBF_EndOfTransfer[DMA_CHANNEL_1]();
-		else
-			LocalError=NULL_POINTER;
 	}
 
-	return LocalError;
 }
 
-DMA1_Channel2_IRQHandler(void)
+void DMA1_Channel2_IRQHandler(void)
 {
-	STD_ERROR LocalError=OK;
 	/*transfer error */
-		if(DMA->ISR &DMA_ISR_TEIF_CH_2)
-		{
-			/*Check the call back function */
-			if(DMA_CBF_ErrorInTransfer[DMA_CHANNEL_2])
-				DMA_CBF_ErrorInTransfer[DMA_CHANNEL_2]();
-			else
-				LocalError=NULL_POINTER;
-		}
+	if(DMA->ISR &DMA_ISR_TEIF_CH_2)
+	{
+		/*Clear transfer error flag */
+		DMA->IFCR|=DMA_IFCR_CTEIF_CH_2;
+		/*Check the call back function */
+		if(DMA_CBF_ErrorInTransfer[DMA_CHANNEL_2])
+			DMA_CBF_ErrorInTransfer[DMA_CHANNEL_2]();
+	}
 	/*half transfer */
 	if(DMA->ISR &DMA_ISR_HTIF_CH_2)
 	{
+		/*Clear half transfer flag */
+		DMA->IFCR|=DMA_IFCR_CHTIF_CH_2;
 		/*Check the call back function */
 		if(DMA_CBF_HalfOfTransfer[DMA_CHANNEL_2])
 			DMA_CBF_HalfOfTransfer[DMA_CHANNEL_2]();
-		else
-			LocalError=NULL_POINTER;
 	}
-	/*transfer complete*/
-
-	if(DMA->ISR &DMA_ISR_HCIF_CH_2)
+	/*transfer complete                                */
+	if(DMA->ISR &DMA_ISR_TCIF_CH_2)
 	{
+		/*Clear the transfer flag	*/
+		DMA->IFCR|=DMA_IFCR_CTCIF_CH_2;
 		/*Check the call back function */
 		if(DMA_CBF_EndOfTransfer[DMA_CHANNEL_2])
 			DMA_CBF_EndOfTransfer[DMA_CHANNEL_2]();
-		else
-			LocalError=NULL_POINTER;
 	}
 
-	return LocalError;
-}  
+}
 
-DMA1_Channel3_IRQHandler(void)
+void DMA1_Channel3_IRQHandler(void)
 {
-	STD_ERROR LocalError=OK;
 	/*transfer error */
 	if(DMA->ISR &DMA_ISR_TEIF_CH_3)
 	{
+		/*Clear transfer error flag */
+		DMA->IFCR|=DMA_IFCR_CTEIF_CH_3;
 		/*Check the call back function */
 		if(DMA_CBF_ErrorInTransfer[DMA_CHANNEL_3])
 			DMA_CBF_ErrorInTransfer[DMA_CHANNEL_3]();
-		else
-			LocalError=NULL_POINTER;
 	}
 	/*half transfer */
 	if(DMA->ISR &DMA_ISR_HTIF_CH_3)
 	{
+		/*Clear half transfer flag */
+		DMA->IFCR|=DMA_IFCR_CHTIF_CH_3;
 		/*Check the call back function */
 		if(DMA_CBF_HalfOfTransfer[DMA_CHANNEL_3])
 			DMA_CBF_HalfOfTransfer[DMA_CHANNEL_3]();
-		else
-			LocalError=NULL_POINTER;
 	}
 	/*transfer complete                                */
-	if(DMA->ISR &DMA_ISR_HCIF_CH_3)
+	if(DMA->ISR &DMA_ISR_TCIF_CH_3)
 	{
+		/*Clear the transfer flag	*/
+		DMA->IFCR|=DMA_IFCR_CTCIF_CH_3;
 		/*Check the call back function */
 		if(DMA_CBF_EndOfTransfer[DMA_CHANNEL_3])
 			DMA_CBF_EndOfTransfer[DMA_CHANNEL_3]();
-		else
-			LocalError=NULL_POINTER;
 	}
-	return LocalError;
-} 
 
-DMA1_Channel4_IRQHandler(void)
+}
+
+
+void DMA1_Channel4_IRQHandler(void)
 {
-	STD_ERROR LocalError=OK;
 	/*transfer error */
 	if(DMA->ISR &DMA_ISR_TEIF_CH_4)
 	{
+		/*Clear transfer error flag */
+		DMA->IFCR|=DMA_IFCR_CTEIF_CH_4;
 		/*Check the call back function */
 		if(DMA_CBF_ErrorInTransfer[DMA_CHANNEL_4])
 			DMA_CBF_ErrorInTransfer[DMA_CHANNEL_4]();
-		else
-			LocalError=NULL_POINTER;
 	}
 	/*half transfer */
 	if(DMA->ISR &DMA_ISR_HTIF_CH_4)
 	{
+		/*Clear half transfer flag */
+		DMA->IFCR|=DMA_IFCR_CHTIF_CH_4;
 		/*Check the call back function */
 		if(DMA_CBF_HalfOfTransfer[DMA_CHANNEL_4])
 			DMA_CBF_HalfOfTransfer[DMA_CHANNEL_4]();
-		else
-			LocalError=NULL_POINTER;
 	}
 	/*transfer complete                                */
-	if(DMA->ISR &DMA_ISR_HCIF_CH_4)
+	if(DMA->ISR &DMA_ISR_TCIF_CH_4)
 	{
+		/*Clear the transfer flag	*/
+		DMA->IFCR|=DMA_IFCR_CTCIF_CH_4;
 		/*Check the call back function */
 		if(DMA_CBF_EndOfTransfer[DMA_CHANNEL_4])
 			DMA_CBF_EndOfTransfer[DMA_CHANNEL_4]();
-		else
-			LocalError=NULL_POINTER;
 	}
-	return LocalError;
-} 
-DMA1_Channel5_IRQHandler(void)
+
+}
+void DMA1_Channel5_IRQHandler(void)
 {
-	STD_ERROR LocalError=OK;
 	/*transfer error */
 	if(DMA->ISR &DMA_ISR_TEIF_CH_5)
 	{
+		/*Clear transfer error flag */
+		DMA->IFCR|=DMA_IFCR_CTEIF_CH_5;
 		/*Check the call back function */
 		if(DMA_CBF_ErrorInTransfer[DMA_CHANNEL_5])
 			DMA_CBF_ErrorInTransfer[DMA_CHANNEL_5]();
-		else
-			LocalError=NULL_POINTER;
 	}
 	/*half transfer */
 	if(DMA->ISR &DMA_ISR_HTIF_CH_5)
 	{
+		/*Clear half transfer flag */
+		DMA->IFCR|=DMA_IFCR_CHTIF_CH_5;
 		/*Check the call back function */
 		if(DMA_CBF_HalfOfTransfer[DMA_CHANNEL_5])
 			DMA_CBF_HalfOfTransfer[DMA_CHANNEL_5]();
-		else
-			LocalError=NULL_POINTER;
 	}
 	/*transfer complete                                */
-	if(DMA->ISR &DMA_ISR_HCIF_CH_5)
+	if(DMA->ISR &DMA_ISR_TCIF_CH_5)
 	{
+		/*Clear the transfer flag	*/
+		DMA->IFCR|=DMA_IFCR_CTCIF_CH_5;
 		/*Check the call back function */
 		if(DMA_CBF_EndOfTransfer[DMA_CHANNEL_5])
 			DMA_CBF_EndOfTransfer[DMA_CHANNEL_5]();
-		else
-			LocalError=NULL_POINTER;
 	}
-	return LocalError;
-} 
-DMA1_Channel6_IRQHandler(void)
+
+}
+void DMA1_Channel6_IRQHandler(void)
 {
-	STD_ERROR LocalError=OK;
 	/*transfer error */
 	if(DMA->ISR &DMA_ISR_TEIF_CH_6)
 	{
+		/*Clear transfer error flag */
+		DMA->IFCR|=DMA_IFCR_CTEIF_CH_6;
 		/*Check the call back function */
 		if(DMA_CBF_ErrorInTransfer[DMA_CHANNEL_6])
 			DMA_CBF_ErrorInTransfer[DMA_CHANNEL_6]();
-		else
-			LocalError=NULL_POINTER;
 	}
 	/*half transfer */
 	if(DMA->ISR &DMA_ISR_HTIF_CH_6)
 	{
+		/*Clear half transfer flag */
+		DMA->IFCR|=DMA_IFCR_CHTIF_CH_6;
 		/*Check the call back function */
 		if(DMA_CBF_HalfOfTransfer[DMA_CHANNEL_6])
 			DMA_CBF_HalfOfTransfer[DMA_CHANNEL_6]();
-		else
-			LocalError=NULL_POINTER;
 	}
 	/*transfer complete                                */
-	if(DMA->ISR &DMA_ISR_HCIF_CH_6)
+	if(DMA->ISR &DMA_ISR_TCIF_CH_6)
 	{
+		/*Clear the transfer flag	*/
+		DMA->IFCR|=DMA_IFCR_CTCIF_CH_6;
 		/*Check the call back function */
 		if(DMA_CBF_EndOfTransfer[DMA_CHANNEL_6])
 			DMA_CBF_EndOfTransfer[DMA_CHANNEL_6]();
-		else
-			LocalError=NULL_POINTER;
 	}
-	return LocalError;
-} 
-DMA1_Channel7_IRQHandler(void)
+
+}
+void DMA1_Channel7_IRQHandler(void)
 {
-	STD_ERROR LocalError=OK;
 	/*transfer error */
 	if(DMA->ISR &DMA_ISR_TEIF_CH_7)
 	{
+		/*Clear transfer error flag */
+		DMA->IFCR|=DMA_IFCR_CTEIF_CH_7;
 		/*Check the call back function */
 		if(DMA_CBF_ErrorInTransfer[DMA_CHANNEL_7])
 			DMA_CBF_ErrorInTransfer[DMA_CHANNEL_7]();
-		else
-			LocalError=NULL_POINTER;
 	}
 	/*half transfer */
 	if(DMA->ISR &DMA_ISR_HTIF_CH_7)
 	{
+		/*Clear half transfer flag */
+		DMA->IFCR|=DMA_IFCR_CHTIF_CH_7;
 		/*Check the call back function */
 		if(DMA_CBF_HalfOfTransfer[DMA_CHANNEL_7])
 			DMA_CBF_HalfOfTransfer[DMA_CHANNEL_7]();
-		else
-			LocalError=NULL_POINTER;
 	}
 	/*transfer complete                                */
-	if(DMA->ISR &DMA_ISR_HCIF_CH_7)
+	if(DMA->ISR &DMA_ISR_TCIF_CH_7)
 	{
+		/*Clear the transfer flag	*/
+		DMA->IFCR|=DMA_IFCR_CTCIF_CH_7;
 		/*Check the call back function */
 		if(DMA_CBF_EndOfTransfer[DMA_CHANNEL_7])
 			DMA_CBF_EndOfTransfer[DMA_CHANNEL_7]();
-		else
-			LocalError=NULL_POINTER;
 	}
-	return LocalError;
-} 
+
+}
+

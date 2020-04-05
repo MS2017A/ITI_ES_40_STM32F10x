@@ -108,7 +108,7 @@ ErrorStatus_t GPIO_InitStr(GPIO_PinConfig_t* GPIO_PinConfig)
 		}
 	}
 
-return LocalError;
+	return LocalError;
 
 }
 
@@ -132,13 +132,13 @@ ErrorStatus_t GPIO_SetPinValue(GPIO_PinConfig_t* GPIO_PinConfig , uint8_t Value)
 	{
 		switch(Value)
 		{
-			case HIGH:
-					PortRegisterPtr->GPIO_BSRR = (1 << GPIO_PinConfig->PIN);
-				break;
+		case HIGH:
+			PortRegisterPtr->GPIO_BSRR = (1 << GPIO_PinConfig->PIN);
+			break;
 
-			case LOW:
-					PortRegisterPtr->GPIO_BRR  = (1 << GPIO_PinConfig->PIN);
-				break;
+		case LOW:
+			PortRegisterPtr->GPIO_BRR  = (1 << GPIO_PinConfig->PIN);
+			break;
 		}
 	}
 	return LocalError;
@@ -229,7 +229,7 @@ ErrorStatus_t GPIO_InitPins(void* PORT , uint16_t P_NUMs , uint8_t MODE)
 		}
 		else
 		{
-			for(uint8_t index = 0 ; index < MAX_NUMBER_BITS ; index++)
+			for(uint8_t index = 0 ; index < MAX_HALF_NUMBER_BITS ; index++)
 			{
 				if( ((P_NUMs >> index) & HIGH) == HIGH)
 				{
@@ -248,6 +248,30 @@ ErrorStatus_t GPIO_InitPins(void* PORT , uint16_t P_NUMs , uint8_t MODE)
 					else
 					{
 						PortRegisterPtr->GPIO_CRL |= ( MODE << (4 * index) );
+					}
+				}
+			}
+
+			for(uint8_t index = MAX_HALF_NUMBER_BITS; index < MAX_NUMBER_BITS ; index++)
+			{
+				uint8_t Localindex=index-8;
+				if( ((P_NUMs >> index) & HIGH) == HIGH)
+				{
+					PortRegisterPtr->GPIO_CRH &= ~( MODE_CLEAR << (4*Localindex));
+
+					if(MODE == MODE_INPUT_PULLUP)
+					{
+						PortRegisterPtr->GPIO_CRH |= ( MODE_INPUT_PULLUP << (4 * Localindex) );
+						PortRegisterPtr->GPIO_ODR |= ( 1 << Localindex );
+					}
+					else if(MODE == MODE_INPUT_PULLDOWN)
+					{
+						PortRegisterPtr->GPIO_CRH |= ( MODE_INPUT_PULLUP << (4 * Localindex) );
+						PortRegisterPtr->GPIO_ODR &= ~( 1 << Localindex );
+					}
+					else
+					{
+						PortRegisterPtr->GPIO_CRH |= ( MODE << (4 * Localindex) );
 					}
 				}
 			}
@@ -277,51 +301,51 @@ ErrorStatus_t GPIO_InitOnePin(void* PORT , uint8_t PIN , uint8_t MODE)
 	else
 	{
 		if( PIN <= 7 )
+		{
+			PortRegisterPtr->GPIO_CRL &= ~( MODE_CLEAR << (4 * PIN) );
+
+			if(MODE == MODE_INPUT_PULLUP)
 			{
-				PortRegisterPtr->GPIO_CRL &= ~( MODE_CLEAR << (4 * PIN) );
-
-				if(MODE == MODE_INPUT_PULLUP)
-				{
-					PortRegisterPtr->GPIO_CRL |= ( MODE_INPUT_PULLUP << (4 * PIN) );
-					PortRegisterPtr->GPIO_ODR |= ( 1 << PIN );
-				}
-				else if(MODE == MODE_INPUT_PULLDOWN)
-				{
-					PortRegisterPtr->GPIO_CRL |= ( (MODE_INPUT_PULLUP) << (4 * PIN) );
-					PortRegisterPtr->GPIO_ODR &= ( 1 << PIN );
-				}
-				else
-				{
-					PortRegisterPtr->GPIO_CRL |= ( MODE << (4 * PIN) );
-				}
-
+				PortRegisterPtr->GPIO_CRL |= ( MODE_INPUT_PULLUP << (4 * PIN) );
+				PortRegisterPtr->GPIO_ODR |= ( 1 << PIN );
 			}
-			else if( PIN <= 15 )
+			else if(MODE == MODE_INPUT_PULLDOWN)
 			{
-				(PortRegisterPtr->GPIO_CRH) &= ~( MODE_CLEAR << (4 * (PIN - 8)) );
-
-
-
-				if(MODE == MODE_INPUT_PULLUP)
-				{
-					PortRegisterPtr->GPIO_CRH |= ( MODE_INPUT_PULLUP << (4 * (PIN - 8)) );
-					PortRegisterPtr->GPIO_BSRR = ( 1 << PIN );
-				}
-				else if(MODE == MODE_INPUT_PULLDOWN)
-				{
-					PortRegisterPtr->GPIO_CRH |= ( MODE_INPUT_PULLUP << (4 * (PIN - 8)) );
-					PortRegisterPtr->GPIO_BRR  = ( 1 << PIN );
-				}
-				else
-				{
-					PortRegisterPtr->GPIO_CRH |= ( MODE_INPUT_PULLUP << (4 * (PIN - 8)) );
-				}
-
+				PortRegisterPtr->GPIO_CRL |= ( (MODE_INPUT_PULLUP) << (4 * PIN) );
+				PortRegisterPtr->GPIO_ODR &= ( 1 << PIN );
 			}
 			else
 			{
-				LocalError = ERROR_NOK;
+				PortRegisterPtr->GPIO_CRL |= ( MODE << (4 * PIN) );
 			}
+
+		}
+		else if( PIN <= 15 )
+		{
+			(PortRegisterPtr->GPIO_CRH) &= ~( MODE_CLEAR << (4 * (PIN - 8)) );
+
+
+
+			if(MODE == MODE_INPUT_PULLUP)
+			{
+				PortRegisterPtr->GPIO_CRH |= ( MODE_INPUT_PULLUP << (4 * (PIN - 8)) );
+				PortRegisterPtr->GPIO_BSRR = ( 1 << PIN );
+			}
+			else if(MODE == MODE_INPUT_PULLDOWN)
+			{
+				PortRegisterPtr->GPIO_CRH |= ( MODE_INPUT_PULLUP << (4 * (PIN - 8)) );
+				PortRegisterPtr->GPIO_BRR  = ( 1 << PIN );
+			}
+			else
+			{
+				PortRegisterPtr->GPIO_CRH |= ( MODE_INPUT_PULLUP << (4 * (PIN - 8)) );
+			}
+
+		}
+		else
+		{
+			LocalError = ERROR_NOK;
+		}
 	}
 
 	return LocalError;
@@ -348,16 +372,16 @@ ErrorStatus_t GPIO_writePinValue(void* PORT , uint16_t P_NUM , uint8_t Value)
 	{
 		switch(Value)
 		{
-			case HIGH:
-						PortRegisterPtr->GPIO_BSRR = P_NUM;
-					break;
+		case HIGH:
+			PortRegisterPtr->GPIO_BSRR = P_NUM;
+			break;
 
-			case LOW:
-						PortRegisterPtr->GPIO_BRR = P_NUM;
-					break;
-			default:
-						LocalError = ERROR_NOK;
-					break;
+		case LOW:
+			PortRegisterPtr->GPIO_BRR = P_NUM;
+			break;
+		default:
+			LocalError = ERROR_NOK;
+			break;
 		}
 	}
 

@@ -1,21 +1,23 @@
-/************************************************************
+/**********************************************************************************************
 Author :Mohamed Ibrahem
-Version:v01
-Date:28 March 2020
-*************************************************************/
+Version:1.0
+Date:5 April 2020
+Description:This Header file is used to interface with the DMA module in STM32f10x evaluation kit
+ ***********************************************************************************************/
+
 #ifndef DMA_INTERFACE_H
 #define DMA_INTERFACE_H
 
 
 
 
-#define DMA_CHANNEL_1     (0)
-#define DMA_CHANNEL_2     (1)
-#define DMA_CHANNEL_3     (2)
-#define DMA_CHANNEL_4     (3)
-#define DMA_CHANNEL_5     (4)
-#define DMA_CHANNEL_6     (5)
-#define DMA_CHANNEL_7     (6)
+#define DMA_CHANNEL_1     (u8)(0)
+#define DMA_CHANNEL_2     (u8)(1)
+#define DMA_CHANNEL_3     (u8)(2)
+#define DMA_CHANNEL_4     (u8)(3)
+#define DMA_CHANNEL_5     (u8)(4)
+#define DMA_CHANNEL_6     (u8)(5)
+#define DMA_CHANNEL_7     (u8)(6)
 
 
 #define NUM_CHANNELS       (7)
@@ -48,13 +50,13 @@ Date:28 March 2020
 
 
 /*channel transfer complete falg                               */
-#define DMA_ISR_HCIF_CH_1         0x00000002
-#define DMA_ISR_HCIF_CH_2         0x00000020
-#define DMA_ISR_HCIF_CH_3         0x00000200
-#define DMA_ISR_HCIF_CH_4         0x00002000
-#define DMA_ISR_HCIF_CH_5         0x00020000
-#define DMA_ISR_HCIF_CH_6         0x00200000
-#define DMA_ISR_HCIF_CH_7         0x02000000
+#define DMA_ISR_TCIF_CH_1         0x00000002
+#define DMA_ISR_TCIF_CH_2         0x00000020
+#define DMA_ISR_TCIF_CH_3         0x00000200
+#define DMA_ISR_TCIF_CH_4         0x00002000
+#define DMA_ISR_TCIF_CH_5         0x00020000
+#define DMA_ISR_TCIF_CH_6         0x00200000
+#define DMA_ISR_TCIF_CH_7         0x02000000
 
 
 /*Channel global interrupt flag                                */
@@ -126,9 +128,9 @@ Date:28 March 2020
 #define DMA_CCR_INTERRUPT_ALL                    0x0000000E
 
 /*Data transfer direction                                       */
-#define DMA_CCR_DIR_MASK			   0xFFFFFFEF
-#define DMA_CCR_DIR_FROM_PERIPHERAL    0x00000010
-#define DMA_CCR_DIR_FROM_MEMORY        0x00000000
+#define DMA_CCR_DIR_MASK			     0xFFFFFFEF
+#define DMA_CCR_DIR_FROM_MEMORY		     0x00000010
+#define DMA_CCR_DIR_FROM_PERIPHERAL      0x00000000
 
 /*Circular Mode                                                 */
 #define DMA_CCR_CIRC_ENABLE            0x00000020
@@ -146,7 +148,7 @@ Date:28 March 2020
 
 /*Peripheral size                                               */
 #define DMA_CCR_PSIZE_MASK             0xFFFFFCFF
-#define  DMA_CCR_PSIZE_8_BITS           0xFFFFFCFF 
+#define  DMA_CCR_PSIZE_8_BITS           0x00000000
 #define  DMA_CCR_PSIZE_16_BITS          0x00000100 
 #define  DMA_CCR_PSIZE_32_BITS          0x00000200 
 
@@ -154,14 +156,14 @@ Date:28 March 2020
 /*Memory size                                                   */
 #define DMA_CCR_MSIZE_MASK             0xFFFFF3FF
                                         
-#define  DMA_CCR_MSIZE_8_BITS           0xFFFFF3FF
+#define  DMA_CCR_MSIZE_8_BITS           0x00000000
 #define  DMA_CCR_MSIZE_16_BITS          0x00000400 
 #define  DMA_CCR_MSIZE_32_BITS          0x00000800  
 
 
 
 /*Channel priority level                                         */
-#define DMA_CCR_PL_MASK                 0xFFFFCFFF
+#define DMA_CCR_PL_MASK                  0xFFFFCFFF
 #define  DMA_CCR_PL_LOW                  0xFFFFCFFF
 #define  DMA_CCR_PL_MED                  0x00001000 
 #define  DMA_CCR_PL_HIGH                 0x00002000 
@@ -174,29 +176,25 @@ Date:28 March 2020
 #define DMA_CCR_MEM2MEM_ENABLE          0x00004000
 #define DMA_CCR_MEM2MEM_DISABLE         0xFFFFBFFF
 
-
-
 /*                                  Functions Prototypes         */
-
-
 void DMA_init(void);
-STD_ERROR DMA_enableChannel(u32 DMA_CHANNEL);
-STD_ERROR DMA_disableChannel(u32 DMA_CHANNEL);
-STD_ERROR DMA_setCBF_EndOfTransfer(u32 DMA_CHANNEL,void(*CBF)(void));
-STD_ERROR DMA_setCBF_HalfOfTransfer(u32 DMA_CHANNEL,void(*CBF)(void));
-STD_ERROR DMA_setCBF_ErrorInTransfer(u32 DMA_CHANNEL,void(*CBF)(void));
-STD_ERROR DMA_SetChannelPriority(u32 DMA_CHANNEL,u32 DMA_CCR_PL);
-STD_ERROR DMA_configureChannel(u32 DMA_CHANNEL,u32 DMA_CCR_PSIZE,u32 DMA_CCR_PINC,u32 DMA_CCR_MSIZE,u32 DMA_CCR_MINC);
-STD_ERROR DMA_enableInterrupt(u32 DMA_CHANNEL,u32 DMA_CCR_INTERRUPT);
-STD_ERROR DMA_disableInterrupt(u32 DMA_CHANNEL,u32 DMA_CCR_INTERRUPT);
-STD_ERROR DMA_enableCircular(u32 DMA_CHANNEL );
-STD_ERROR DMA_disableCircular(u32 DMA_CHANNEL);
-STD_ERROR DMA_setDirction(u32 DMA_CHANNEL,u32 DMA_CCR_DIR_FROM);
-STD_ERROR DMA_enableMem2Mem(u32 DMA_CHANNEL );
-STD_ERROR DMA_disableMem2Mem(u32 DMA_CHANNEL);
-STD_ERROR DMA_setNumberOfDataTransfer(u32 DMA_CHANNEL,u32 CopyNumber_Transfer);
-STD_ERROR DMA_setPeripheralAddress(u32 DMA_CHANNEL,u32 CopyPeripheralAddr);
-STD_ERROR DMA_setMemoryAddress(u32 DMA_CHANNEL,u32 CopyMemokryAddr);
+STD_ERROR DMA_enableChannel(u8 DMA_CHANNEL);
+STD_ERROR DMA_disableChannel(u8 DMA_CHANNEL);
+STD_ERROR DMA_setCBF_EndOfTransfer(u8 DMA_CHANNEL,void(*CBF)(void));
+STD_ERROR DMA_setCBF_HalfOfTransfer(u8 DMA_CHANNEL,void(*CBF)(void));
+STD_ERROR DMA_setCBF_ErrorInTransfer(u8 DMA_CHANNEL,void(*CBF)(void));
+STD_ERROR DMA_SetChannelPriority(u8 DMA_CHANNEL,u32 DMA_CCR_PL);
+STD_ERROR DMA_configureChannel(u8 DMA_CHANNEL,u32 DMA_CCR_PSIZE,u32 DMA_CCR_PINC,u32 DMA_CCR_MSIZE,u32 DMA_CCR_MINC);
+STD_ERROR DMA_enableInterrupt(u8 DMA_CHANNEL,u32 DMA_CCR_INTERRUPT);
+STD_ERROR DMA_disableInterrupt(u8 DMA_CHANNEL,u32 DMA_CCR_INTERRUPT);
+STD_ERROR DMA_enableCircular(u8 DMA_CHANNEL );
+STD_ERROR DMA_disableCircular(u8 DMA_CHANNEL);
+STD_ERROR DMA_setDirction(u8 DMA_CHANNEL,u32 DMA_CCR_DIR_FROM);
+STD_ERROR DMA_enableMem2Mem(u8 DMA_CHANNEL );
+STD_ERROR DMA_disableMem2Mem(u8 DMA_CHANNEL);
+STD_ERROR DMA_setNumberOfDataTransfer(u8 DMA_CHANNEL,u32 CopyNumber_Transfer);
+STD_ERROR DMA_setPeripheralAddress(u8 DMA_CHANNEL,u32 CopyPeripheralAddr);
+STD_ERROR DMA_setMemoryAddress(u8 DMA_CHANNEL,u32 CopyMemokryAddr);
 
 
 #endif
