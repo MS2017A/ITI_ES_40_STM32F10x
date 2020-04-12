@@ -138,6 +138,8 @@ Date:31 March 2020
 
 
 
+
+
 STD_ERROR HRCC_SetSysClock(u32 HRCC_CLOCK);
 
 
@@ -148,6 +150,8 @@ STD_ERROR HRCC_SetSystemClock(u32 RCC_CFGR_SW);
 
 STD_ERROR HRCC_EnablePeripheral(u32 HRCC_PERIPHERAL);
 STD_ERROR HRCC_DisablePeripheral(u32 HRCC_PERIPHERAL);
+u32 HRCC_GetAPB1_Speed(void);
+u32 HRCC_GetAPB2_Speed(void);
 
 
 #endif

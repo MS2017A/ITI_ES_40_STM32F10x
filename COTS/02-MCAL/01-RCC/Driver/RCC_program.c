@@ -512,6 +512,8 @@ STD_ERROR RCC_SetAPB2_Prescaler(u32 RCC_CFGR_PPRE2_HCLK)
 	return LocalError;
 }
 
+
+
 /*This Function shall Get the AHP prescaler
 Inputs:void
 Outputs:
@@ -520,7 +522,6 @@ RCC_CFGR_PPRE2_HCLK_DIVIDED_2
 RCC_CFGR_PPRE2_HCLK_DIVIDED_4
 RCC_CFGR_PPRE2_HCLK_DIVIDED_8
 RCC_CFGR_PPRE2_HCLK_DIVIDED_16
-
 */
 
 u32 RCC_GetAPB2_Prescaler()
@@ -824,4 +825,5 @@ u32 RCC_GetAHP_Speed()
 	trace_printf("%d",Speed);
 	return Speed;
 }
+
 

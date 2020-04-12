@@ -1,4 +1,3 @@
-#include "BIT_MATH.h"
 #include "STD_TYPES.h"
 #include"RCC.h"
 #include "HRCC_interfac.h"
@@ -238,6 +237,112 @@ STD_ERROR HRCC_SetSysClock(u32 HRCC_CLOCK )
 
 }
 
+
+u32 HRCC_GetAPB1_Speed(void)
+{
+	u32 speed=72000000;
+
+
+	switch (RCC_GetAHP_Prescaler())
+	{
+	case RCC_CFGR_HPRE_SYSCLK_DIVIDED_2:
+		speed/=2;
+		break;
+	case RCC_CFGR_HPRE_SYSCLK_DIVIDED_4:
+		speed/=4;
+		break;
+	case RCC_CFGR_HPRE_SYSCLK_DIVIDED_8:
+		speed/=8;
+		break;
+	case RCC_CFGR_HPRE_SYSCLK_DIVIDED_16:
+		speed/=16;
+		break;
+	case RCC_CFGR_HPRE_SYSCLK_DIVIDED_64:
+		speed/=64;
+		break;
+	case RCC_CFGR_HPRE_SYSCLK_DIVIDED_128:
+		speed/=128;
+		break;
+	case RCC_CFGR_HPRE_SYSCLK_DIVIDED_256:
+		speed/=256;
+		break;
+	case RCC_CFGR_HPRE_SYSCLK_DIVIDED_512:
+		speed/=512;
+		break;
+	}
+	switch (RCC_GetAPB1_Prescaler())
+	{
+	case RCC_CFGR_PPRE1_HCLK_DIVIDED_2:
+		speed/=2;
+		break;
+	case RCC_CFGR_PPRE1_HCLK_DIVIDED_4:
+		speed/=4;
+		break;
+	case RCC_CFGR_PPRE1_HCLK_DIVIDED_8:
+		speed/=8;
+		break;
+
+	case RCC_CFGR_PPRE1_HCLK_DIVIDED_16:
+		speed/=16;
+		break;
+	}
+	/*trace_printf("%d",speed);*/
+	return speed;
+
+}
+
+u32 HRCC_GetAPB2_Speed(void)
+{
+	u32 speed=72000000;
+
+
+	switch (RCC_GetAHP_Prescaler())
+	{
+	case RCC_CFGR_HPRE_SYSCLK_DIVIDED_2:
+		speed/=2;
+		break;
+	case RCC_CFGR_HPRE_SYSCLK_DIVIDED_4:
+		speed/=4;
+		break;
+	case RCC_CFGR_HPRE_SYSCLK_DIVIDED_8:
+		speed/=8;
+		break;
+	case RCC_CFGR_HPRE_SYSCLK_DIVIDED_16:
+		speed/=16;
+		break;
+	case RCC_CFGR_HPRE_SYSCLK_DIVIDED_64:
+		speed/=64;
+		break;
+	case RCC_CFGR_HPRE_SYSCLK_DIVIDED_128:
+		speed/=128;
+		break;
+	case RCC_CFGR_HPRE_SYSCLK_DIVIDED_256:
+		speed/=256;
+		break;
+	case RCC_CFGR_HPRE_SYSCLK_DIVIDED_512:
+		speed/=512;
+		break;
+	}
+	switch (RCC_GetAPB2_Prescaler())
+	{
+	case RCC_CFGR_PPRE2_HCLK_DIVIDED_2:
+		speed/=2;
+		break;
+	case RCC_CFGR_PPRE2_HCLK_DIVIDED_4:
+		speed/=4;
+		break;
+	case RCC_CFGR_PPRE2_HCLK_DIVIDED_8:
+		speed/=8;
+		break;
+
+	case RCC_CFGR_PPRE2_HCLK_DIVIDED_16:
+		speed/=16;
+		break;
+	}
+	/*trace_printf("%d",speed);*/
+	return speed;
+
+}
 
 
 
