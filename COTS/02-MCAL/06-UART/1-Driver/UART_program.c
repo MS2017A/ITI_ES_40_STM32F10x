@@ -10,7 +10,22 @@ Description:This Source file is used to interface with the UART module in STM32f
 #include "DMA_interface.h"
 
 
-#define 	UART_INIT_CONFIG		UART_CR1_ENABLED | UART_TRANSMIT_ENABLE | UART_RECIEVE_ENABLE
+#define UART_INIT_CONFIG					UART_CR1_ENABLED | UART_TRANSMIT_ENABLE | UART_RECIEVE_ENABLE
+#define	UART_CR2_STOPBIT_DISABLE_MASK		0xCFFF
+#define	UART_CR2_CLK_DISABLE_MASK			0xF7FF
+
+#define UART_LIN_BREAK_INTERRUPT_MASK		0xFFBF
+#define UART_LIN_MASK						0xBFFF
+#define UART_LIN_BREAK_LENGTH_MASK			0xFFDF
+
+
+#define UART_IREN_MASK 						0xFFFD
+#define UART_SCEN_MASK 						0xFFDF
+#define UART_HDSEL_MASK 					0xFFF7
+
+#define	UART_LIN_BREAK_SEND					0x0001
+
+
 
 typedef struct
 {
@@ -35,10 +50,16 @@ UART_data_t UART_TxBuffer;
 UART_data_t UART_RxBuffer;
 
 
+extern const UART_CFG_t UART_cfg [UART_MODULES_NUM];
+
 /*Array of call back function for transmit */
 void (*UART_EndOfJobNotification_Tx[UART_MODULES_NUM])(void);
 /*Array of call back function for receive */
 void (*UART_EndOfJobNotification_Rx[UART_MODULES_NUM])(void);
+/*	Array of call back function for the LIN break	*/
+void (*UART_LINbreakSequence[UART_MODULES_NUM])(u8);
+
+
 
 /*Array of UART base addresses */
 const uint32_t Uart_Address[UART_MODULES_NUM] = {
@@ -69,6 +90,11 @@ const uint32_t Uart_DMA_RX[UART_MODULES_NUM] = {
 void UART_voidInitStruct(UART_CFG_t UART_cfg,u32 UART_CHANNEL,u32 sysClk)
 {
 	volatile UART_t* UART = ((volatile UART_t*)Uart_Address[UART_CHANNEL]);
+	u32 tempCR2 = UART->CR2;
+	u32 tempCR3 = UART->CR3;
+
+
+
 	f64 tmpBaudRate = ((f64)sysClk / ((f64)UART_cfg.BaudRate * 16.0));
 	/* Clear Baudrate Register and set the mantissa */
 	UART->BRR = ((uint32_t)(tmpBaudRate)) << 4;
@@ -77,22 +103,59 @@ void UART_voidInitStruct(UART_CFG_t UART_cfg,u32 UART_CHANNEL,u32 sysClk)
 	/* Setting the parity bit */
 
 
-	//UART->BRR=UART_cfg.BaudRate;
-	if (UART_cfg.Mode==UART_MODE_INTERRUPT)
+	/*	check if LIN is enabled	*/
+	if(UART_cfg.LINstate == UART_LIN_DISABLE)
 	{
+		if (UART_cfg.Mode == UART_MODE_INTERRUPT)
+		{
+			/*Enable the UART ,configure the data size,configure the parity ,Enable the rx not empty interrupt,Enable the tx and rx in UART */
+			UART->CR1 =(UART_cfg.DateSize|UART_cfg.Parity|UART_INIT_CONFIG|UART_INTERRUPT_RXNEIE_ENABLE);
+		}
+		else
+		{
+			/*Enable the UART ,configure the data size,configure the parity Enable the tx and rx in UART */
+			UART->CR1 =(UART_cfg.DateSize|UART_cfg.Parity|UART_INIT_CONFIG);
+		}
+		/*Configure number of stop bits */
+		UART->CR2 = UART_cfg.StopBit;
+	}
+	else if(UART_cfg.LINstate == UART_LIN_ENABLE)
+	{
+
 		/*Enable the UART ,configure the data size,configure the parity ,Enable the rx not empty interrupt,Enable the tx and rx in UART */
-		UART->CR1 =(UART_cfg.DateSize|UART_cfg.Parity|UART_INIT_CONFIG|UART_INTERRUPT_RXNEIE_ENABLE);
+		UART->CR1 =(UART_CR1_DATA_BITS_8|UART_PARITY_DISABLED|UART_INIT_CONFIG|UART_INTERRUPT_RXNEIE_ENABLE);
+
+		/*	clear the bits that is needed to be cleared according to the data sheet	*/
+		tempCR2 &= (UART_LIN_MASK & UART_LIN_BREAK_INTERRUPT_MASK & UART_LIN_BREAK_LENGTH_MASK & UART_CR2_STOPBIT_DISABLE_MASK & UART_CR2_CLK_DISABLE_MASK);
+		tempCR3 &= (UART_IREN_MASK & UART_SCEN_MASK & UART_HDSEL_MASK);
+
+		/*	put your configurations	*/
+		tempCR2 |= (UART_LIN_STATE | UART_LIN_BREAK_INTERRUPT_STATE | UART_LIN_BREAK_LENGTH);
+
+		UART->CR2 = tempCR2;
+		UART->CR3 = tempCR3;
 	}
 	else
 	{
-		/*Enable the UART ,configure the data size,configure the parity Enable the tx and rx in UART */
-		UART->CR1 =(UART_cfg.DateSize|UART_cfg.Parity|UART_INIT_CONFIG);
+		/*	do nothing	*/
 	}
-	/*Configure number of stop bits */
-	UART->CR2 = UART_cfg.StopBit;
 
 }
 
+inline ErrorStatus  UART_LINgenerateBreak(u32 UART_CHANNEL)
+{
+	u8 state = OK;
+	volatile UART_t* UART = ((volatile UART_t*)Uart_Address[UART_CHANNEL]);
+	if (UART_cfg[UART_CHANNEL].LINstate == UART_LIN_ENABLE)
+	{
+		UART->CR1 |= UART_LIN_BREAK_SEND;
+	}
+	else
+	{
+		state = NOK;
+	}
+	return state;
+}
 
 
 void UART_IRQHandler(u32 UART_CHANNEL)
@@ -100,66 +163,79 @@ void UART_IRQHandler(u32 UART_CHANNEL)
 
 	volatile UART_t* UART = ((volatile UART_t*)Uart_Address[UART_CHANNEL]);
 
-	if(UART->SR & UART_STATUS_RXNE)
+	if(UART->SR & UART_SR_LIN_BREAK_DETECTION_FLAG)
 	{
-		if(UART_RxBuffer.state == BUSY)
+		UART->SR &= ~UART_SR_LIN_BREAK_DETECTION_FLAG;
+		if(UART_LINbreakSequence[UART_CHANNEL])
 		{
-			UART_RxBuffer.position ++;
-			UART_RxBuffer.data[UART_RxBuffer.position] = UART->DR;
-		}
-
-		if(UART_RxBuffer.position == UART_RxBuffer.size)
-		{
-			/*reset the data buffer */
-			UART_RxBuffer.data = NULL;
-			UART_RxBuffer.size = 0;
-			UART_RxBuffer.position = 0;
-			UART_RxBuffer.state = OK;
-			/*Disable the rx not empty  interrupt */
-			UART->CR1&=UART_INTERRUPT_RXNEIE_DISABLE;
-
-			if(UART_EndOfJobNotification_Rx[UART_CHANNEL])
-				UART_EndOfJobNotification_Rx[UART_CHANNEL]();
+			UART_LINbreakSequence[UART_CHANNEL](UART_CHANNEL);
 		}
 	}
-	/* */
-	if(UART->SR & UART_STATUS_TC)
+	else
 	{
 
-		/*Disable the transmit complete interrupt */
-		UART->SR &=UART_INTERRUPT_TCE_DISABLE;
-		/*Call the End of notification call back function */
-		if(UART_EndOfJobNotification_Tx[UART_CHANNEL])
-			UART_EndOfJobNotification_Tx[UART_CHANNEL]();
-	}
-	/*transmit the incoming byte in the data buffer*/
-	if(UART->SR & UART_STATUS_TXE)
-	{
-		if(UART_TxBuffer.position < UART_TxBuffer.size)
+		if(UART->SR & UART_STATUS_RXNE)
 		{
+			if(UART_RxBuffer.state == BUSY)
+			{
+				UART_RxBuffer.data[UART_RxBuffer.position] = UART->DR;
+				UART_RxBuffer.position ++;
+			}
 
-			UART->DR = UART_TxBuffer.data[UART_TxBuffer.position];
-			UART_TxBuffer.position ++;
+			if(UART_RxBuffer.position == UART_RxBuffer.size)
+			{
+				/*reset the data buffer */
+				UART_RxBuffer.data = NULL;
+				UART_RxBuffer.size = 0;
+				UART_RxBuffer.position = 0;
+				UART_RxBuffer.state = OK;
+				/*Disable the rx not empty  interrupt */
+				UART->CR1   &= UART_INTERRUPT_RXNEIE_DISABLE ;
 
+				if(UART_EndOfJobNotification_Rx[UART_CHANNEL])
+					UART_EndOfJobNotification_Rx[UART_CHANNEL]();
+			}
 		}
-		else
+		/* */
+		if(UART->SR & UART_STATUS_TC)
 		{
-			/*Rest the data buffer */
-			UART_TxBuffer.state = OK;
-			UART_TxBuffer.data = NULL;
-			UART_TxBuffer.size = 0;
-			UART_TxBuffer.position = 0;
 
-			/*Disable transmit empty interrupt */
-			UART->CR1&=UART_INTERRUPT_TXE_DISABLE;
+			/*Disable the transmit complete interrupt */
+			UART->SR &=UART_INTERRUPT_TCE_DISABLE;
 			/*Call the End of notification call back function */
 			if(UART_EndOfJobNotification_Tx[UART_CHANNEL])
 				UART_EndOfJobNotification_Tx[UART_CHANNEL]();
 		}
+		/*transmit the incoming byte in the data buffer*/
+		if(UART->SR & UART_STATUS_TXE)
+		{
+			if(UART_TxBuffer.position < UART_TxBuffer.size)
+			{
 
+				UART->DR = UART_TxBuffer.data[UART_TxBuffer.position];
+				UART_TxBuffer.position ++;
+
+			}
+			else
+			{
+				/*Rest the data buffer */
+				UART_TxBuffer.state = OK;
+				UART_TxBuffer.data = NULL;
+				UART_TxBuffer.size = 0;
+				UART_TxBuffer.position = 0;
+
+				/*Disable transmit empty interrupt */
+				UART->CR1&=UART_INTERRUPT_TXE_DISABLE;
+				/*Call the End of notification call back function */
+				if(UART_EndOfJobNotification_Tx[UART_CHANNEL])
+					UART_EndOfJobNotification_Tx[UART_CHANNEL]();
+			}
+
+		}
 	}
 
 }
+
 
 u8 UART_errTransmit(u32 UART_CHANNEL,u8* Copy_pu8Data, u16 Copy_u16Size)
 {
@@ -320,6 +396,22 @@ u8 UART_errSetCallBackRecieve(u32 UART_CHANNEL, UART_callBack_t UART_callBack)
 	return Error_st;
 }
 
+
+ErrorStatus UART_LINsetCallBackBreak(u8 LIN_CHANNEL,void (*callBackFunction)(u8))
+{
+	u8 status = OK;
+	if(callBackFunction)
+	{
+		UART_LINbreakSequence[LIN_CHANNEL] = callBackFunction;
+	}
+	else
+	{
+		status = NULLPOINTER;
+	}
+	return status;
+
+}
+
 UART_STATUS UART_u16GetStatus(u32 UART_CHANNEL)
 {
 	volatile UART_t* UART = ((volatile UART_t*)Uart_Address[UART_CHANNEL]);
@@ -327,10 +419,12 @@ UART_STATUS UART_u16GetStatus(u32 UART_CHANNEL)
 }
 
 
+
+
+
 void USART1_IRQHandler(void)
 {
 	UART_IRQHandler(UART_CHANNEL_1);
-
 }
 void USART2_IRQHandler(void)
 {

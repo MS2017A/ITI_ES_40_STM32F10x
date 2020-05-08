@@ -93,7 +93,46 @@ OPTIONS:
  ***************************************************************/
 /*#define 	UART_BAUDRATE			UART_BAUDRATE_8MHZ   */
 
+
+/***************************************************************
+ * Description: Enable or disable LIN detection
+ *
+ * Options:
+ * 		1- UART_LIN_ENABLE
+ * 		2- UART_LIN_DISABLE
+ ***************************************************************/
+
+#define UART_LIN_STATE		UART_LIN_ENABLE
+
+
+/***************************************************************
+ * Description: Enable or disable LIN interrupt detection
+ *
+ * Options:
+ * 		1- UART_LIN_BREAK_INTERRUPT_ENABLE
+ * 		2- UART_LIN_BREAK_INTERRUPT_DISABLE
+ ***************************************************************/
+
+#define	UART_LIN_BREAK_INTERRUPT_STATE	UART_LIN_BREAK_INTERRUPT_ENABLE
+
+/***************************************************************
+ * Description: Enable or disable LIN interrupt detection
+ *
+ * Options:
+ * 		1- UART_LIN_BREAK_11_DETECTION
+ * 		2- UART_LIN_BREAK_10_DETECTION
+ ***************************************************************/
+
+
+#define UART_LIN_BREAK_LENGTH			UART_LIN_BREAK_11_DETECTION
+
+
+
+
 UART_CFG_t* Get_UART_CnfStruct(void);
+
+
+
 
 
 
